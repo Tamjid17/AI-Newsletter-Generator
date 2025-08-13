@@ -1,9 +1,32 @@
 "use client";
 
-import { useState } from "react";
+import { createClient } from "@/lib/client";
+import React, { useState } from "react";
 
 export default function LogInPage() {
     const [isSignUp, setIsSignUp] = useState(false);
+    const [email, setEmail] = useState("");
+    const [password, setPassword] = useState("");
+    const [message, setMessage] = useState("");
+    const supabase = createClient();
+
+    async function handleAuth(event: React.FormEvent) {
+        event.preventDefault();
+        try {
+            if (isSignUp) {
+                const { error } = await supabase.auth.signUp({ email, password });
+
+                if(error) throw error;
+                setMessage("Check your email for the confirmation link.");
+            } else {
+                const { error } = await supabase.auth.signInWithPassword({ email, password });
+
+                if(error) throw error;
+            }
+        } catch {
+
+        }
+    }
     return (
       <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 flex items-center justify-center py-12px-4sm:px-6 lg:px-8">
         <div className="max-w-md w-full space-y-8">
@@ -17,7 +40,13 @@ export default function LogInPage() {
           </div>
 
           <div className="bg-white rounded-lg shadow-lg p-8">
-            <form className="space-y-6">
+            <form className="space-y-6" onSubmit={handleAuth}>
+                {message && (
+                    <div className="bg-green-50 border border-green-200 rounded-md p-4">
+                    <p className="text-sm text-green-600">{`Message: ${message}`}</p>
+                    </div>
+                )}
+            <div>
               <label
                 htmlFor="email"
                 className="block text-sm font-medium text-gray-700"
@@ -29,6 +58,8 @@ export default function LogInPage() {
                 type="email"
                 name="Email"
                 placeholder="Enter your email"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
                 required
                 className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 text-black focus:outline-none focus:ring-blue-500 focus:border-blue-500"
               />
@@ -43,9 +74,12 @@ export default function LogInPage() {
                 id="password"
                 name="Password"
                 placeholder="Enter your password"
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
                 required
                 className="mt-1 block w-full px-3 py-2 border text-black border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-blue-500 focus:border-blue-500"
               />
+              </div>
               <div>
                 <button
                   type="submit"
