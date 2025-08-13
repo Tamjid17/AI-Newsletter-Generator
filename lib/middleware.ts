@@ -51,6 +51,12 @@ if (request.nextUrl.pathname === "/login" && user) {
   return NextResponse.redirect(url);
 }
 
+if (request.nextUrl.pathname === "/dashboard" && !user) {
+  const url = request.nextUrl.clone();
+  url.pathname = "/login";
+  return NextResponse.redirect(url);
+}
+
 //   if (
 //     !user &&
 //     !request.nextUrl.pathname.startsWith("/login") &&
