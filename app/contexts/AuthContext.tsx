@@ -38,15 +38,12 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         return () => {
             subscription.unsubscribe();
         };
-        
+
     }, [supabase.auth]);
 
 
     async function signOut() {
         await supabase.auth.signOut();
-        setUser(null);
-        setSession(null);
-        setLoading(false);
     }
 
     const value = {
