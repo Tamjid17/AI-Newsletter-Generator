@@ -1,3 +1,4 @@
+import { inngest } from "@/lib/inngest/client";
 import { createClient } from "@/lib/server";
 import { NextRequest, NextResponse } from "next/server";
 
@@ -46,6 +47,13 @@ export async function POST(request: NextRequest) {
             { status: 500 }
           );
         }
+
+        const {} = await inngest.send({
+          name: "newsletter.scheduled",
+          data: {
+
+          }
+        })
 
         return NextResponse.json({
             success: true,
