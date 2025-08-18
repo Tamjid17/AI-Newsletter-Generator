@@ -51,7 +51,8 @@ export async function POST(request: NextRequest) {
         const {} = await inngest.send({
           name: "newsletter.scheduled",
           data: {
-
+            categories,
+            email
           }
         })
 
