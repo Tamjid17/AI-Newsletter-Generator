@@ -1,13 +1,15 @@
 import { fetchArticles } from "@/lib/news";
 import { inngest } from "../client"
+import { marked } from "marked";
+import { sendEmail } from "@/lib/email";
 
 export default inngest.createFunction(
     {id: "scheduled-newsletter"}, 
     {event: "newsletter.scheduled"},
     async ({event, step, runId}) => {
-      
+
       // Fetch articles per category
-      const categories = ["technology", "health", "finance"];
+      const categories = event.data.categories;
       const allArticles = await step.run("fetch-news", async () => {
         return fetchArticles(categories);
       });
@@ -84,6 +86,12 @@ export default inngest.createFunction(
         }
 
         const finalSummary = data.choices[0].message.content;
+
+        const htmlSummary = await marked(finalSummary);
+
+        await step.run("send-email", async () => {
+          await sendEmail(event.data.email, event.data.categories.join(", "), allArticles.length, htmlSummary);
+        })
 
         console.log("Generated summary:", finalSummary);
         return {
