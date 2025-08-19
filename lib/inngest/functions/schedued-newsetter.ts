@@ -2,7 +2,6 @@ import { fetchArticles } from "@/lib/news";
 import { inngest } from "../client"
 import { marked } from "marked";
 import { sendEmail } from "@/lib/email";
-import { create } from "domain";
 import { createClient } from "@/lib/server";
 
 export default inngest.createFunction(
@@ -15,7 +14,7 @@ export default inngest.createFunction(
         const { data, error } = await supabase
         .from("user_preferences")
         .select("is_active")
-        .eq("user_id", event.data.user_id)
+        .eq("user_id", event.data.userId)
         .single();
 
         if(error) {
