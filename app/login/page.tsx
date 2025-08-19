@@ -63,15 +63,15 @@ export default function LogInPage() {
   return (
     <div className="min-h-screen bg-gradient-to-br from-[#2c3e50] to-[#1f618d] text-[#ecf0f1] font-['Inter',_sans-serif] flex items-center justify-center p-4">
       <div className="max-w-md w-full space-y-8">
-        <div className="text-center">
-          <h1 className="flex items-center justify-center text-4xl font-bold mb-2">
-            <Image
-              src="/newspaper.svg"
-              alt="Newsletter Icon"
-              width={36}
-              height={36}
-              className="w-7 h-7 mr-3"
-            />
+        <div className="flex flex-col items-center text-center">
+          <Image
+            src="/newspaper.svg"
+            alt="Newsletter Icon"
+            width={48}
+            height={48}
+            className="w-12 h-12 mb-4"
+          />
+          <h1 className="text-4xl font-bold mb-2">
             Personalized AI Newsletter
           </h1>
           <p className="text-xl text-[#95a5a6]">
