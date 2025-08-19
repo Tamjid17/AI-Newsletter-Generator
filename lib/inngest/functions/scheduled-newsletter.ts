@@ -7,7 +7,7 @@ import { createClient } from "@/lib/server";
 export default inngest.createFunction(
     {id: "scheduled-newsletter"}, 
     {event: "newsletter.scheduled"},
-    async ({event, step, runId}) => {
+    async ({event, step}) => {
 
       const isUserActive = await step.run("check-user-status", async () => {
         const supabase = await createClient();
