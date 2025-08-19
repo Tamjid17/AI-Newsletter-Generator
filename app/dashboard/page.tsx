@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
+import Image from "next/image";
 
 interface UserPreferences {
   categories: string[];
@@ -73,8 +74,15 @@ export default function DashboardPage() {
     <div className="min-h-screen bg-gradient-to-br from-[#2c3e50] to-[#1f618d] text-[#ecf0f1] font-['Inter',_sans-serif] p-4 sm:p-6 lg:p-8">
       <div className="max-w-4xl mx-auto">
         <div className="text-center mb-10">
-          <h1 className="text-4xl font-bold mb-2">
-            📰 Your Newsletter Dashboard
+          <h1 className="flex items-center justify-center text-4xl font-bold mb-2">
+            <Image
+              src="/newspaper.svg"
+              alt="Newsletter Icon"
+              width={36}
+              height={36}
+              className="w-7 h-7 mr-3"
+            />
+            Your Newsletter Dashboard
           </h1>
           <p className="text-xl text-[#95a5a6]">
             Manage your personalized newsletter preferences
@@ -190,7 +198,6 @@ export default function DashboardPage() {
           </div>
         </div>
 
-        {/* --- START: RESTORED AND RESTYLED INFORMATION SECTION --- */}
         <div className="mt-8 bg-[#2c3e50] bg-opacity-50 rounded-lg p-6 border border-[#34495e]">
           <h3 className="text-lg font-semibold text-[#ecf0f1] mb-3">
             How It Works

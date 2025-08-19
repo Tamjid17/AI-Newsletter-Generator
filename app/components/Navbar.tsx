@@ -2,7 +2,8 @@
 
 import { useRouter } from "next/navigation";
 import { useAuth } from "../contexts/AuthContext";
-import Link from "next/link"; // Import Link for navigation
+import Link from "next/link";
+import Image from "next/image";
 
 export default function Navbar() {
   const { user, signOut } = useAuth();
@@ -13,10 +14,9 @@ export default function Navbar() {
     router.push("/login");
   };
 
-  // The navbar is part of the layout for authenticated users,
-  // so we can assume the user exists if the component is rendered.
+
   if (!user) {
-    return null; // Or render a version for logged-out users if needed
+    return null;
   }
 
   return (
@@ -25,7 +25,13 @@ export default function Navbar() {
         <div className="flex justify-between items-center h-16">
           <div className="flex items-center">
             <Link href="/dashboard" className="flex items-center space-x-2">
-              <span className="text-xl">📰</span>
+              <Image
+                src="/newspaper.svg"
+                alt="Newsletter Icon"
+                width={24}
+                height={24}
+                className="w-7 h-7"
+              />
               <h1 className="text-xl font-semibold text-[#ecf0f1] hover:text-white transition-colors">
                 Personalized AI Newsletter
               </h1>

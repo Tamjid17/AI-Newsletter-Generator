@@ -259,7 +259,6 @@ export default function SelectPage() {
             </div>
           </div>
 
-          {/* --- START: RESTORED SUBMIT SECTION --- */}
           <div className="flex flex-col sm:flex-row items-center justify-between border-t border-[#34495e] pt-6 gap-4">
             <div className="text-sm text-[#95a5a6] capitalize">
               {selectedCategories.length} categor
