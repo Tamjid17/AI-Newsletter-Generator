@@ -2,11 +2,32 @@ import { fetchArticles } from "@/lib/news";
 import { inngest } from "../client"
 import { marked } from "marked";
 import { sendEmail } from "@/lib/email";
+import { create } from "domain";
+import { createClient } from "@/lib/server";
 
 export default inngest.createFunction(
     {id: "scheduled-newsletter"}, 
     {event: "newsletter.scheduled"},
     async ({event, step, runId}) => {
+
+      const isUserActive = await step.run("check-user-status", async () => {
+        const supabase = await createClient();
+        const { data, error } = await supabase
+        .from("user_preferences")
+        .select("is_active")
+        .eq("user_id", event.data.user_id)
+        .single();
+
+        if(error) {
+          return false;
+        }
+
+        return data.is_active || false;
+      });
+
+      if(!isUserActive) {
+        return {};
+      }
 
       // Fetch articles per category
       const categories = event.data.categories;
@@ -127,6 +148,7 @@ export default inngest.createFunction(
         console.log("Generated summary:", finalSummary);
         return {
           summary: finalSummary,
+          articleCount: allArticles.length,
           status: "success",
         };
       } catch (error) {
