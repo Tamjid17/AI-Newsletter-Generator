@@ -13,6 +13,7 @@ export async function fetchArticles(categories: string[]): Promise<Array<{ title
                 return [];
             }
             const data = await response.json();
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
             return data.articles.slice(0, 5).map((article: any) => ({
                 title: article.title,
                 url: article.url,
