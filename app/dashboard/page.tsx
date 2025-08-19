@@ -41,6 +41,24 @@ export default function DashboardPage() {
     router.push("/select");
   };
 
+  const handleToggleActive = async (newStatus: boolean) => {
+    try {
+      const response = await fetch("/api/user-preferences", {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ is_active: newStatus }),
+      });
+
+      if(response.ok) {
+        setPreferences((prev) => (prev? {...prev, is_active: newStatus } : null));
+      } else {
+        console.error("Failed to update is_active status");
+      }
+    } catch (error) {
+      console.error("Error updating is_active status:", error);
+    }
+  }
+
   if (isLoading) {
     return (
       <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 py-8 px-4 sm:px-6 lg:px-8">
@@ -169,9 +187,54 @@ export default function DashboardPage() {
                 </svg>
                 Update Preferences
               </button>
+              {preferences && (
+                <>
+                  {preferences.is_active ? (
+                    <button
+                      onClick={() => handleToggleActive(false)}
+                      className="w-full flex items-center justify-center px-4 py-3 border border-red-300 text-sm font-medium rounded-md text-red-700 bg-red-50 hover:bg-red-100 transition-colors"
+                    >
+                      <svg
+                        className="w-5 h-5 mr-2"
+                        fill="none"
+                        stroke="currentColor"
+                        viewBox="0 0 24 24"
+                      >
+                        <path
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          strokeWidth={2}
+                          d="M18.364 18.364A9 9 0 005.636 5.636m12.728 12.728L5.636 5.636m12.728 12.728L18.364 5.636M5.636 18.364l12.728-12.728"
+                        />
+                      </svg>
+                      Pause Newsletter
+                    </button>
+                  ) : (
+                    <button
+                      onClick={() => handleToggleActive(true)}
+                      className="w-full flex items-center justify-center px-4 py-3 border border-green-300 text-sm font-medium rounded-md text-green-700 bg-green-50 hover:bg-green-100 transition-colors"
+                    >
+                      <svg
+                        className="w-5 h-5 mr-2"
+                        fill="none"
+                        stroke="currentColor"
+                        viewBox="0 0 24 24"
+                      >
+                        <path
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          strokeWidth={2}
+                          d="M5 13l4 4L19 7"
+                        />
+                      </svg>
+                      Resume Newsletter
+                    </button>
+                  )}
+                </>
+              )}
             </div>
           </div>
-        </div>        
+        </div>
       </div>
     </div>
   );
