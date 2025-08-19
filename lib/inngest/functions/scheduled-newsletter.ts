@@ -76,6 +76,7 @@ export default inngest.createFunction(
                 Articles:
                 ${allArticles
                   .map(
+                    // eslint-disable-next-line @typescript-eslint/no-explicit-any
                     (article: any, index: number) =>
                       `${index + 1}. ${article.title}\n   ${
                         article.description
