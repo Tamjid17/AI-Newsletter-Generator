@@ -52,8 +52,9 @@ export async function POST(request: NextRequest) {
           name: "newsletter.scheduled",
           data: {
             categories,
-            email
-          }
+            email,
+            frequency,
+          },
         })
 
         return NextResponse.json({
