@@ -30,15 +30,25 @@ export async function POST(request: NextRequest) {
          { status: 400 }
        );
     }
+    
+    // Fetch current active status for the user
+    const { data: existingPreferences } = await supabase
+      .from("user_preferences")
+      .select("is_active")
+      .eq("user_id", user.id)
+      .single();
+
+    const isActiveStatus = existingPreferences?.is_active ?? true;
+
     const { error: upsertError } = await supabase
-        .from("user_preferences")
-        .upsert({
-            user_id: user.id,
-            categories: categories,
-            frequency,
-            email,
-            is_active: true
-        }, { onConflict: 'user_id' });
+      .from("user_preferences")
+      .upsert({
+        user_id: user.id,
+        categories: categories,
+        frequency,
+        email,
+        is_active: isActiveStatus
+      }, { onConflict: 'user_id' });
 
         if (upsertError) {
           console.error("Error saving preferences:", upsertError);
@@ -54,6 +64,7 @@ export async function POST(request: NextRequest) {
             categories,
             email,
             frequency,
+            userId: user.id,
           },
         })
 
@@ -136,6 +147,14 @@ export async function PATCH(request: NextRequest) {
       );
     }
 
+    if (!is_active) {
+      console.log(
+        `User ${user.id} paused their newsletter. Future jobs will be skipped.`
+      );
+    } else {
+      await rescheduleUserNewsletter(user.id);
+    }
+
     return NextResponse.json({
       success: true,
       status: 200
@@ -146,5 +165,55 @@ export async function PATCH(request: NextRequest) {
       { error: "Failed to update preferences" },
       { status: 500 }
     );
+  }
+}
+
+async function rescheduleUserNewsletter(userId: string) {
+  const supabase = await createClient();
+
+  try {
+    const { data: preferences, error } = await supabase
+      .from("user_preferences")
+      .select("categories, frequency, email")
+      .eq("user_id", userId)
+      .single();
+
+    if (error || !preferences) {
+      throw new Error(`User preferences not found for userId: ${userId}`);
+    }
+
+    const now = new Date();
+    let nextScheduleTime: Date;
+    switch (preferences.frequency) {
+      case "daily":
+        nextScheduleTime = new Date(now.getTime() + 24 * 60 * 60 * 1000);
+        break;
+      case "weekly":
+        nextScheduleTime = new Date(now.getTime() + 7 * 24 * 60 * 60 * 1000);
+        break;
+      case "biweekly":
+        nextScheduleTime = new Date(now.getTime() + 3 * 24 * 60 * 60 * 1000);
+        break;
+      default:
+        nextScheduleTime = new Date(now.getTime() + 7 * 24 * 60 * 60 * 1000);
+    }
+    nextScheduleTime.setHours(9, 0, 0, 0);
+
+    await inngest.send({
+      name: "newsletter.scheduled",
+      data: {
+        userId: userId,
+        email: preferences.email,
+        categories: preferences.categories,
+        frequency: preferences.frequency,
+      },
+      ts: nextScheduleTime.getTime(),
+    });
+
+    console.log(
+      `Rescheduled newsletter for user ${userId} at ${nextScheduleTime.toISOString()}`
+    );
+  } catch (error) {
+    console.error("Error in rescheduleUserNewsletter:", error);
   }
 }
