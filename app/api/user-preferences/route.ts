@@ -63,7 +63,7 @@ export async function POST(request: NextRequest) {
         })
 }
 
-export async function GET(request: NextRequest) {
+export async function GET() {
   const supabase = await createClient();
 
   const {
@@ -77,26 +77,73 @@ export async function GET(request: NextRequest) {
     );
   }
 
-  const { data: preferences, error } = await supabase
-    .from("user_preferences")
-    .select("*")
-    .eq("user_id", user.id)
-    .single();
+  try {
+    const { data: preferences, error } = await supabase
+      .from("user_preferences")
+      .select("*")
+      .eq("user_id", user.id)
+      .single();
 
-  if (error) {
-    console.error("Error fetching preferences:", error);
+    if (error) {
+      console.error("Error fetching preferences:", error);
+      return NextResponse.json(
+        { error: "Failed to fetch preferences" },
+        { status: 500 }
+      );
+    }
+
+    if (!preferences) {
+      return NextResponse.json(
+        { error: "Preferences not found" },
+        { status: 404 }
+      );
+    }
+
+    return NextResponse.json(preferences, { status: 200 });
+  } catch (error) {
+  console.error("Error fetching preferences:", error);
+  return NextResponse.json(
+    { error: "Failed to fetch preferences" },
+    { status: 500 }
+  );
+}
+}
+
+export async function PATCH(request: NextRequest) {
+  const supabase = await createClient();
+  const { data: { user } } = await supabase.auth.getUser();
+  if(!user) {
     return NextResponse.json(
-      { error: "Failed to fetch preferences" },
+      { error: "You must be logged in to save preferences." },
+      { status: 401 }
+    );
+  }
+  try {
+    const body = await request.json();
+    const { is_active } = body
+
+    const { error: updateError } = await supabase
+      .from("user_preferences")
+      .update({ is_active })
+      .eq("user_id", user.id);
+
+    if (updateError) {
+      console.error("Error updating preferences:", updateError);
+      return NextResponse.json(
+        { error: "Failed to update preferences" },
+        { status: 500 }
+      );
+    }
+
+    return NextResponse.json({
+      success: true,
+      status: 200
+    });
+  } catch (error) {
+    console.error("Error updating preferences:", error);
+    return NextResponse.json(
+      { error: "Failed to update preferences" },
       { status: 500 }
     );
   }
-
-  if (!preferences) {
-    return NextResponse.json(
-      { error: "Preferences not found" },
-      { status: 404 }
-    );
-  }
-
-  return NextResponse.json(preferences, { status: 200 });
 }
