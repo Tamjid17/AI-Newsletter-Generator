@@ -51,10 +51,21 @@ export default function LogInPage() {
       }
     } // eslint-disable-next-line @typescript-eslint/no-explicit-any
     catch (error: any) {
-      toast.error(
-        error.error_description || error.message || "An error occurred.",
-        { id: toastId }
-      );
+      if (error.message.includes("User already registered")) {
+        await supabase.auth.resend({ type: "signup", email: email });
+        toast.success(
+          "This email is already registered. A new confirmation link has been sent.",
+          {
+            id: toastId,
+            duration: 6000,
+          }
+        );
+      } else {
+        toast.error(
+          error.error_description || error.message || "An error occurred.",
+          { id: toastId }
+        ); 
+      }
     } finally {
       setIsLoading(false);
     }
