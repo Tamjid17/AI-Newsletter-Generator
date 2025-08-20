@@ -31,8 +31,8 @@ export default function DashboardPage() {
           setPreferences(data);
         }
       })
-      .catch(() => {
-        router.replace("/subscribe");
+      .catch((error) => {
+        console.error(error);
       })
       .finally(() => {
         setIsLoading(false);
