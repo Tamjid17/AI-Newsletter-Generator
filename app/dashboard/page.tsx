@@ -208,7 +208,7 @@ export default function DashboardPage() {
               categories.
             </li>
             <li>
-              Newsletters are delivered to your email at 9 AM according to your
+              Newsletters are delivered to your email at 9 AM (UTC) according to your
               chosen frequency.
             </li>
             <li>
